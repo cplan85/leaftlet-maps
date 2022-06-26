@@ -9,8 +9,8 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <title>Barcelona Map: Leaflet</title>
         <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="index.css">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <link rel="stylesheet" href="mobile-example.css">
 
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.8.0/dist/leaflet.css"
         integrity="sha512-hoalWLoI8r4UszCkZ5kL8vayOGVae1oxXe/2A4AO6J9+580uKHDO3JdHb7NzwwzK5xr/Fs0W40kiNHxM9vyTtQ=="
@@ -19,9 +19,6 @@
     <body>
 
         <div id="map"></div>
-        <!--[if lt IE 7]>
-            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
-        <![endif]-->
         
        
         <script src="https://unpkg.com/leaflet@1.8.0/dist/leaflet.js"
@@ -35,45 +32,26 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 maxZoom: 19,
 attribution: '© OpenStreetMap'
 }).addTo(map);
-// ADDING A MARKER
-var marker = L.marker([41.3947,2.0698]).addTo(map);
 
-// ADDING A POLYGON
-var circle = L.circle([41.3947,2.1298], {
-    color: 'red',
-    fillColor: '#f03',
-    fillOpacity: 0.5,
-    radius: 300
-}).addTo(map)
+function onLocationFound(e) {
+    var radius = e.accuracy;
 
-// 
-marker.bindPopup("<b>Hello world!</b><br>I am a popup.").openPopup();
-circle.bindPopup("I am a circle.");
+    L.marker(e.latlng).addTo(map)
+        .bindPopup("You are within " + radius + " meters from this point").openPopup();
 
-var polygon = L.polygon([
-    [41.3947, 2.0298],
-    [41.4242, 2.0098],
-    [41.3940, 2.0698]
-]).addTo(map);
-
-polygon.bindPopup("I am a polygon.");
-
-// Standalone popu-up
-
-// Pop-up without object 
-var popup = L.popup()
-    .setLatLng([41.4947, 2.1298])
-    .setContent("I am a standalone popup.")
-    .openOn(map);
-
-    function onMapClick(e) {
-    popup
-        .setLatLng(e.latlng)
-        .setContent("You clicked the map at " + e.latlng.toString())
-        .openOn(map);
+    L.circle(e.latlng, radius).addTo(map);
 }
 
-map.on('click', onMapClick);
+map.on('locationfound', onLocationFound);
+
+function onLocationError(e) {
+    alert(e.message);
+}
+
+map.on('locationerror', onLocationError);
+
+map.locate({setView: true, maxZoom: 16});
+
 
     </script>
     </body>
